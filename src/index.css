@@ -1,3 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+body {
+  @apply bg-reader-day text-gray-800 font-serif;
+}
