@@ -20,7 +20,7 @@ export default function FileUploader({ onTextLoaded }) {
     if (ext === "txt") {
       const reader = new FileReader();
       reader.onload = () => {
-        onTextLoaded(reader.result);
+        onTextLoaded(reader.result); // 纯文本
       };
       reader.readAsText(file, "utf-8");
     }
@@ -38,24 +38,17 @@ export default function FileUploader({ onTextLoaded }) {
           const pageText = textContent.items.map((item) => item.str).join(" ");
           content += pageText + "\n";
         }
-        onTextLoaded(content);
+        onTextLoaded(content); // 纯文本
       };
       reader.readAsArrayBuffer(file);
     }
 
-    // 处理 EPUB
+    // 处理 EPUB（只传 book，不渲染）
     if (ext === "epub") {
       const reader = new FileReader();
       reader.onload = async () => {
         const book = ePub(reader.result);
-        await book.ready;
-        let allText = "";
-        for (const item of book.spine.spineItems) {
-          await item.load(book.load.bind(book));
-          allText += item.document.body.textContent + "\n";
-          item.unload();
-        }
-        onTextLoaded(allText);
+        onTextLoaded({ type: "epub", book }); // ✅ 只传 book
       };
       reader.readAsArrayBuffer(file);
     }
