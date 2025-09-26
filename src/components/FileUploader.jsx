@@ -20,7 +20,7 @@ export default function FileUploader({ onTextLoaded }) {
     if (ext === "txt") {
       const reader = new FileReader();
       reader.onload = () => {
-        onTextLoaded(reader.result); // 纯文本
+        onTextLoaded(reader.result);
       };
       reader.readAsText(file, "utf-8");
     }
@@ -38,17 +38,17 @@ export default function FileUploader({ onTextLoaded }) {
           const pageText = textContent.items.map((item) => item.str).join(" ");
           content += pageText + "\n";
         }
-        onTextLoaded(content); // 纯文本
+        onTextLoaded(content);
       };
       reader.readAsArrayBuffer(file);
     }
 
-    // 处理 EPUB（只传 book，不渲染）
+    // 处理 EPUB
     if (ext === "epub") {
       const reader = new FileReader();
       reader.onload = async () => {
         const book = ePub(reader.result);
-        onTextLoaded({ type: "epub", book }); // ✅ 只传 book
+        onTextLoaded({ type: "epub", book });
       };
       reader.readAsArrayBuffer(file);
     }
@@ -61,7 +61,7 @@ export default function FileUploader({ onTextLoaded }) {
         accept=".txt,.pdf,.epub"
         onChange={(e) => {
           handleFileUpload(e);
-          e.target.value = ""; // ✅ 上传后重置 input，保证下次还能触发
+          e.target.value = ""; // 允许连续上传同一文件
         }}
         className="block mb-2"
       />
