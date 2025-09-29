@@ -13,13 +13,16 @@ export function useTranslator() {
 
     const now = Date.now();
     if (picked === lastRef.current.text && now - lastRef.current.t < 500) {
+      console.log("[useTranslator] 短时间重复选中，忽略");
       return; // 避免短时间重复触发
     }
     lastRef.current = { text: picked, t: now };
 
+    console.log("[useTranslator] Translating ");
     setPopup({ show: true, x, y, content: "Translating..." });
 
     if (busyRef.current) return;
+    console.log("[useTranslator] 正在翻译中，忽略新的请求");
     busyRef.current = true;
 
     try {

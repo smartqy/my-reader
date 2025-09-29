@@ -7,26 +7,48 @@ export function usePopupVisibility(setPopup, iframeDoc = null) {
       const popupEl = document.querySelector("#popup");
       if (popupEl && e.target && popupEl.contains(e.target)) return;
 
-      console.log("[usePopupVisibility] 点击 Popup 外部 -> 关闭");
-      setPopup((prev) => (prev.show ? { ...prev, show: false } : prev));
+      setPopup((prev) => {
+        if (prev.content === "Translating...") {
+          console.log("[usePopupVisibility] 点击外部，但正在翻译 -> 保持");
+          return prev; // 👈 不关闭
+        }
+        console.log("[usePopupVisibility] 点击 Popup 外部 -> 关闭");
+        return prev.show ? { ...prev, show: false } : prev;
+      });
     };
 
     // 主文档选区变化
     const handleSelectionChangeMain = () => {
       const sel = window.getSelection();
       if (!sel || sel.toString().trim() === "") {
-        console.log("[usePopupVisibility] 主文档选区被清空 -> 关闭 Popup");
-        setPopup((prev) => (prev.show ? { ...prev, show: false } : prev));
+        setPopup((prev) => {
+          if (prev.content === "Translating...") {
+            console.log(
+              "[usePopupVisibility] 主文档选区被清空，但正在翻译 -> 保持"
+            );
+            return prev;
+          }
+          console.log("[usePopupVisibility] 主文档选区被清空 -> 关闭 Popup");
+          return prev.show ? { ...prev, show: false } : prev;
+        });
       }
     };
 
-    // iframe 内部选区变化
+    // iframe 文档选区变化
     const handleSelectionChangeIframe = () => {
       if (!iframeDoc) return;
       const sel = iframeDoc.getSelection();
       if (!sel || sel.toString().trim() === "") {
-        console.log("[usePopupVisibility] iframe 选区被清空 -> 关闭 Popup");
-        setPopup((prev) => (prev.show ? { ...prev, show: false } : prev));
+        setPopup((prev) => {
+          if (prev.content === "Translating...") {
+            console.log(
+              "[usePopupVisibility] iframe 选区被清空，但正在翻译 -> 保持"
+            );
+            return prev;
+          }
+          console.log("[usePopupVisibility] iframe 选区被清空 -> 关闭 Popup");
+          return prev.show ? { ...prev, show: false } : prev;
+        });
       }
     };
 
@@ -44,14 +66,12 @@ export function usePopupVisibility(setPopup, iframeDoc = null) {
     }
 
     return () => {
-      // 主文档解绑
       document.removeEventListener("click", handleClick);
       document.removeEventListener(
         "selectionchange",
         handleSelectionChangeMain
       );
 
-      // iframe 解绑
       if (iframeDoc) {
         iframeDoc.removeEventListener("click", handleClick);
         iframeDoc.removeEventListener(
@@ -60,5 +80,5 @@ export function usePopupVisibility(setPopup, iframeDoc = null) {
         );
       }
     };
-  }, [setPopup, iframeDoc]); // ✅ 保持依赖数组稳定
+  }, [setPopup, iframeDoc]);
 }
