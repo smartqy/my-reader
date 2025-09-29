@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import ThemeSwitcher from "./ThemeSwitcher.jsx";
+import TocSidebar from "./TocSidebar.jsx";
 
 export default function Paginator({
   text,
@@ -13,6 +14,7 @@ export default function Paginator({
   const [rendition, setRendition] = useState(null);
   const viewerRef = useRef(null);
   const textBoxRef = useRef(null);
+  const [showToc, setShowToc] = useState(false);
 
   const themeClasses = {
     day: "bg-[#fdfcf5] text-gray-800",
@@ -112,7 +114,6 @@ export default function Paginator({
   }
 
   // 普通文本模式
-  // 普通文本模式
   if (typeof text === "string") {
     return (
       <div className="flex flex-col items-center w-full">
@@ -178,6 +179,7 @@ export default function Paginator({
           style={{ height: "70vh", overflow: "hidden" }}
         />
 
+        {/* 控制区：翻页 + 目录 */}
         <div className="flex gap-4 mt-4 relative z-10">
           <button
             onClick={() => {
@@ -188,6 +190,7 @@ export default function Paginator({
           >
             ◀ 上一页
           </button>
+
           <button
             onClick={() => {
               rendition && rendition.next();
@@ -197,7 +200,25 @@ export default function Paginator({
           >
             下一页 ▶
           </button>
+
+          {/* 📖 目录按钮 */}
+          <button
+            onClick={() => setShowToc((prev) => !prev)}
+            className="px-5 py-2.5 bg-green-500 text-white rounded-xl shadow hover:bg-green-600 transition"
+          >
+            📖 目录
+          </button>
         </div>
+
+        {/* 目录 Sidebar */}
+        {showToc && (
+          <TocSidebar
+            book={text.book}
+            rendition={rendition}
+            onClose={() => setShowToc(false)}
+            onClearPopup={onClearPopup}
+          />
+        )}
       </div>
     );
   }
