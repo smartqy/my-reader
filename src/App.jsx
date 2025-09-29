@@ -14,8 +14,10 @@ export default function App() {
   usePopupVisibility(setPopup, iframeDoc);
 
   return (
-    <div className="relative p-8 bg-gray-100 min-h-screen flex flex-col items-center">
-      <h1 className="text-3xl font-bold text-blue-600 mb-6">My Reader</h1>
+    <div className="relative p-8 min-h-screen flex flex-col items-center bg-gradient-to-br from-gray-50 to-gray-100">
+      <h1 className="text-4xl font-extrabold text-blue-600 mb-8 drop-shadow-sm">
+        My Reader
+      </h1>
 
       <FileUploader onTextLoaded={setText} />
 

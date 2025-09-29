@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import ThemeSwitcher from "./ThemeSwitcher.jsx";
 
 export default function Paginator({
   text,
@@ -111,9 +112,14 @@ export default function Paginator({
   }
 
   // 普通文本模式
+  // 普通文本模式
   if (typeof text === "string") {
     return (
       <div className="flex flex-col items-center w-full">
+        {/* 主题切换器 */}
+        <ThemeSwitcher theme={theme} setTheme={setTheme} />
+
+        {/* 阅读区 */}
         <div
           ref={textBoxRef}
           className={`shadow-md rounded-lg p-6 max-w-2xl leading-relaxed transition-colors duration-300 ${themeClasses[theme]}`}
@@ -161,6 +167,10 @@ export default function Paginator({
   if (typeof text === "object" && text.type === "epub") {
     return (
       <div className="flex flex-col items-center w-full">
+        {/* 主题切换器 */}
+        <ThemeSwitcher theme={theme} setTheme={setTheme} />
+
+        {/* EPUB 阅读区 */}
         <div
           ref={viewerRef}
           id="viewer"
@@ -172,18 +182,18 @@ export default function Paginator({
           <button
             onClick={() => {
               rendition && rendition.prev();
-              onClearPopup?.(); // 翻页时清除 popup
+              onClearPopup?.();
             }}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow hover:from-blue-600 hover:to-indigo-600 transition disabled:opacity-50"
           >
             ◀ 上一页
           </button>
           <button
             onClick={() => {
               rendition && rendition.next();
-              onClearPopup?.(); // 翻页时清除 popup
+              onClearPopup?.();
             }}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow hover:from-blue-600 hover:to-indigo-600 transition disabled:opacity-50"
           >
             下一页 ▶
           </button>
