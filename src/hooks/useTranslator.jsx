@@ -6,9 +6,15 @@ export function useTranslator() {
   const lastRef = useRef({ text: "", t: 0 });
 
   const handleSelect = async ({ text: picked, x, y }) => {
-    const now = Date.now();
-    if (picked === lastRef.current.text && now - lastRef.current.t < 500)
+    if (!picked || picked.trim() === "") {
+      console.log("[useTranslator] 空选区，忽略");
       return;
+    }
+
+    const now = Date.now();
+    if (picked === lastRef.current.text && now - lastRef.current.t < 500) {
+      return; // 避免短时间重复触发
+    }
     lastRef.current = { text: picked, t: now };
 
     setPopup({ show: true, x, y, content: "Translating..." });
@@ -23,6 +29,7 @@ export function useTranslator() {
         body: JSON.stringify({ text: picked, to: "zh-CN" }),
       });
       const data = await resp.json();
+
       setPopup({
         show: true,
         x,
@@ -34,6 +41,7 @@ export function useTranslator() {
       setPopup({ show: true, x, y, content: "❌ Error connecting to server" });
     } finally {
       busyRef.current = false;
+      console.log("[useTranslator] busyRef 重置为 false");
     }
   };
 

@@ -1,11 +1,36 @@
+import { useEffect } from "react";
+
+export function usePopupVisibility(setPopup) {
+  useEffect(() => {
+    // 点击空白时关闭（不管是否选中文字）
+    const handleClick = (e) => {
+      const popupEl = document.querySelector("#popup");
+      if (popupEl && e.target && popupEl.contains(e.target)) return;
+
+      setPopup((prev) => (prev.show ? { ...prev, show: false } : prev));
+    };
+
+    // 选区变化时关闭（只有取消选区时）
+    const handleSelectionChange = () => {
+      const sel = window.getSelection();
+      if (!sel || sel.toString().trim() === "") {
+        setPopup((prev) => (prev.show ? { ...prev, show: false } : prev));
+      }
+    };
+
+    document.addEventListener("click", handleClick);
+    document.addEventListener("selectionchange", handleSelectionChange);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+      document.removeEventListener("selectionchange", handleSelectionChange);
+    };
+  }, [setPopup]);
+}
+
 import { useState, useEffect, useRef } from "react";
 
-export default function Paginator({
-  text,
-  onSelect,
-  onClearPopup,
-  onIframeReady,
-}) {
+export default function Paginator({ text, onSelect }) {
   const [pages, setPages] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [theme, setTheme] = useState("day");
@@ -62,22 +87,11 @@ export default function Paginator({
         const win = contents.window;
         const doc = contents.document;
 
-        // 把 iframe document 回传给 App
-        onIframeReady?.(doc);
-
         const handleMouseUp = () => {
-          console.log("[Paginator] mouseup 触发");
           const sel = win.getSelection();
-          if (!sel || sel.rangeCount === 0) {
-            console.log("[Paginator] 没有选区，直接 return");
-            return;
-          }
-
+          if (!sel || sel.rangeCount === 0) return;
           const picked = sel.toString().trim();
-          if (!picked) {
-            console.log("[Paginator] 选中文字为空 -> return");
-            return;
-          }
+          if (!picked) return;
 
           const range = sel.getRangeAt(0);
           const rect = range.getBoundingClientRect();
@@ -101,7 +115,6 @@ export default function Paginator({
         r.off("rendered", onRendered);
         r.destroy();
         setRendition(null);
-        onIframeReady?.(null); // 清理
       };
     }
   }, [text?.book]);
@@ -129,10 +142,7 @@ export default function Paginator({
         {pages.length > 0 && (
           <div className="flex gap-4 mt-4">
             <button
-              onClick={() => {
-                setCurrentPage((p) => Math.max(0, p - 1));
-                onClearPopup?.(); // 翻页时清除 popup
-              }}
+              onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
               disabled={currentPage === 0}
               className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
             >
@@ -142,10 +152,9 @@ export default function Paginator({
               Page {currentPage + 1} / {pages.length}
             </span>
             <button
-              onClick={() => {
-                setCurrentPage((p) => Math.min(pages.length - 1, p + 1));
-                onClearPopup?.(); // 翻页时清除 popup
-              }}
+              onClick={() =>
+                setCurrentPage((p) => Math.min(pages.length - 1, p + 1))
+              }
               disabled={currentPage === pages.length - 1}
               className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
             >
@@ -170,19 +179,13 @@ export default function Paginator({
 
         <div className="flex gap-4 mt-4 relative z-10">
           <button
-            onClick={() => {
-              rendition && rendition.prev();
-              onClearPopup?.(); // 翻页时清除 popup
-            }}
+            onClick={() => rendition && rendition.prev()}
             className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
           >
             ◀ 上一页
           </button>
           <button
-            onClick={() => {
-              rendition && rendition.next();
-              onClearPopup?.(); // 翻页时清除 popup
-            }}
+            onClick={() => rendition && rendition.next()}
             className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
           >
             下一页 ▶

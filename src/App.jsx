@@ -7,10 +7,11 @@ import { usePopupVisibility } from "./hooks/usePopupVisibility.jsx";
 
 export default function App() {
   const [text, setText] = useState("");
+  const [iframeDoc, setIframeDoc] = useState(null); // 👈 保存 EPUB 的 iframe document
   const { popup, setPopup, handleSelect } = useTranslator();
 
-  // 👇 监听选区变化，清除浮窗
-  usePopupVisibility(setPopup);
+  // 👇 监听主页面 + iframe 内部
+  usePopupVisibility(setPopup, iframeDoc);
 
   return (
     <div className="relative p-8 bg-gray-100 min-h-screen flex flex-col items-center">
@@ -21,8 +22,8 @@ export default function App() {
       <Paginator
         text={text}
         onSelect={handleSelect}
-        // 👇 翻页时清除浮窗
         onClearPopup={() => setPopup((prev) => ({ ...prev, show: false }))}
+        onIframeReady={setIframeDoc} // 👈 把 iframe doc 回传进来
       />
 
       <Popup popup={popup} />
