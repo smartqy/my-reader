@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "daisyui": "^5.1.25",
     "epubjs": "^0.3.93",
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.544.0",

@@ -14,20 +14,33 @@ export default function App() {
   usePopupVisibility(setPopup, iframeDoc);
 
   return (
-    <div className="relative p-8 min-h-screen flex flex-col items-center bg-gradient-to-br from-gray-50 to-gray-100">
-      <h1 className="text-4xl font-extrabold text-blue-600 mb-8 drop-shadow-sm">
-        My Reader
-      </h1>
+    <div className="min-h-screen bg-[#f5f3e7] text-[#3f3a33] font-serif flex flex-col items-center py-10 px-6">
+      {/* 标题区 */}
+      <header className="mb-10 text-center">
+        <h1 className="text-5xl font-serif font-semibold tracking-wide text-[#8b7355] select-none">
+          <span className="bg-gradient-to-r from-[#b58e5d] to-[#d2b48c] bg-clip-text text-transparent drop-shadow-sm">
+            My&nbsp;Reader
+          </span>
+        </h1>
+        <div className="mt-3 h-[2px] w-24 mx-auto bg-[#d2b48c]/70 rounded-full"></div>
+      </header>
 
-      <FileUploader onTextLoaded={setText} />
+      {/* 上传区 */}
+      <section className="w-full max-w-md mb-10">
+        <FileUploader onTextLoaded={setText} />
+      </section>
 
-      <Paginator
-        text={text}
-        onSelect={handleSelect}
-        onClearPopup={() => setPopup((prev) => ({ ...prev, show: false }))}
-        onIframeReady={setIframeDoc} // 👈 把 iframe doc 回传进来
-      />
+      {/* 阅读区 */}
+      <main className="relative w-full max-w-4xl bg-[#fdfcf6] border border-[#e5dcc4]/80 rounded-2xl shadow-md p-6 md:p-10 flex-1 flex flex-col items-center">
+        <Paginator
+          text={text}
+          onSelect={handleSelect}
+          onClearPopup={() => setPopup((prev) => ({ ...prev, show: false }))}
+          onIframeReady={setIframeDoc}
+        />
+      </main>
 
+      {/* 弹窗（例如目录 / 注释） */}
       <Popup popup={popup} />
     </div>
   );
